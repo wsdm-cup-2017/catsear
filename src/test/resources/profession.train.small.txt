@@ -1,0 +1,4 @@
+Barack Obama	Politician
+Barack Obama	Lawyer
+Barack Obama	Law professor
+Barack Obama	Author
