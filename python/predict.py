@@ -18,55 +18,52 @@ print "Loading model..."
 model = Word2Vec.load_word2vec_format('instance-sentences.bin', binary=True)
 
 print "Loading possible objects..."
-nat_list = list()
+x_list = list()
 with open(ref) as f:
     for line in f:
-        nat_list.append(line[:-1])
-# prf_list = list()
-# with open('reference/professions') as f:
-#     for line in f:
-#         prf_list.append(line[:-1])
+        x_list.append(line[:-1])
 
 print "Processing KB {}...".format(inp)
-nat_dict = dict()
+x_dict = dict()
 with open(inp) as f:
     for line in f:
         line = line[:-1].split('\t')
-        if line[0] not in nat_dict:
-            nat_dict[line[0]] = list()
-        nat_dict[line[0]].append(line[1])
+        if line[0] not in x_dict:
+            x_dict[line[0]] = list()
+        x_dict[line[0]].append(line[1])
 
 # for each raw name...
 with open(out, 'w') as f:
-    for key in nat_dict:
+    for key in x_dict:
         name = unicode(key.replace(' ', '_'), "utf-8")
         # print name, nat
         if name not in model.vocab:
             # give 7 as we do not have any hint...
-            for nat_x in nat_dict[key]:
-                f.write("{}\t{}\t{}\n".format(key, nat_x, "7"))
+            for x_x in x_dict[key]:
+                f.write("{}\t{}\t{}\n".format(key, x_x, "7"))
         else:
-            # get list of aim nationalities
-            nat_aim = nat_dict[key]
-            sim_max, sim_min = 0.0, 1.0
+            # get list of aim objects
+            x_aim = x_dict[key]
+            sim_max, sim_min = -1.0, 1.0
             sims = dict()
-            # for each nationality...
-            for nat_x in nat_list:
+            # for each object...
+            for x_x in x_list:
                 if flc == "True":
-                    s = nat_x.lower()
+                    s = x_x.lower()
                 else:
-                    s = nat_x
+                    s = x_x
                 # get similarity
                 sim = model.n_similarity([name], s.split(' '))
+                # compute max/min similarity
                 if sim > sim_max:
                     sim_max = sim
                 if sim < sim_min:
                     sim_min = sim
-                if nat_x in nat_aim:
-                    sims[nat_x] = sim
-            # print name, sims
-            # normalize in [1,7]
-            for nat_x in sims:
-                sim_norm = 1 + 6 * (sims[nat_x] - sim_min) / (sim_max - sim_min)
-                f.write("{}\t{}\t{}\n".format(key, nat_x, int(sim_norm)))
+                # save similarity of the raw name and an aim object
+                if x_x in x_aim:
+                    sims[x_x] = sim
+            # normalize in [2,7]
+            for x_x in sims:
+                sim_norm = int(2 + 5 * (sims[x_x] - sim_min) / (sim_max - sim_min))
+                f.write("{}\t{}\t{}\n".format(key, x_x, sim_norm))
         
