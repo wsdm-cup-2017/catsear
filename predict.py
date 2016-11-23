@@ -44,7 +44,7 @@ with open(out, 'w') as f:
         else:
             # get list of aim objects
             x_aim = x_dict[key]
-            sim_max, sim_min = 0.0, 1.0
+            sim_max, sim_min = -1.0, 1.0
             sims = dict()
             # for each object...
             for x_x in x_list:
@@ -54,13 +54,14 @@ with open(out, 'w') as f:
                     s = x_x
                 # get similarity
                 sim = model.n_similarity([name], s.split(' '))
+                # compute max/min similarity
                 if sim > sim_max:
                     sim_max = sim
                 if sim < sim_min:
                     sim_min = sim
+                # save similarity of the raw name and an aim object
                 if x_x in x_aim:
                     sims[x_x] = sim
-            # print name, sims
             # normalize in [2,7]
             for x_x in sims:
                 sim_norm = int(2 + 5 * (sims[x_x] - sim_min) / (sim_max - sim_min))
