@@ -41,7 +41,8 @@ public class TripleScore {
 	private final static String DBO_PROFESSION = "http://dbpedia.org/ontology/profession";
 	private final static String DBP_PROFESSION = "http://dbpedia.org/property/profession";
 	
-	private final static Integer SOME_EVIDENCE = 2; // Range from 0 to 4
+	private final static Integer SOME_EVIDENCE = 5; // Range from 3 to 7
+	private final static Integer FULL_EVIDENCE = 5; // Range from 3 to 7
 	
 	public static void main(String[] args) {
 		
@@ -124,7 +125,7 @@ public class TripleScore {
 		Integer firstSpamScore = score(entryURL, entry.getObject(), filters, properties);
 		
 		if(firstSpamScore != null && firstSpamScore == 7) { // full match
-			return 7;
+			return FULL_EVIDENCE;
 		}
 		
 		SCC entrySCC = Knowledgebase.DBpedia39.getSCC(entryURL);
@@ -152,7 +153,7 @@ public class TripleScore {
 							properties);
 					if(score != null) {
 						if(score == 7) { // full match
-							return 7;
+							return FULL_EVIDENCE;
 						} else if(firstSpamScore == null || score > firstSpamScore) {
 							firstSpamScore = score;
 						}
@@ -193,7 +194,7 @@ public class TripleScore {
 				labels,
 				types);
 		if(score >= 1) { // full match
-			return 7;
+			return FULL_EVIDENCE;
 		} else if(score > 0) { // partial match
 			return SOME_EVIDENCE;
 		}
