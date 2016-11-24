@@ -3,7 +3,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-in1, in2, in3 = sys.argv[1:4]
+in1 = sys.argv[1]
+inputs = sys.argv[2:]
 
 #
 # Nationality=0.81 & Professions=0.71
@@ -15,10 +16,11 @@ def strategy(diga, tom):
     else:
         return 2
 
-def strategy3(diga, tom, andre):
-    if andre == 0:
-        return strategy(diga, tom)
-    return 5
+def multi_strategy(v):
+    diga, tom, dem, andre = v[0], v[1], v[2], v[3]
+    if dem >= 4:
+        return 5
+    return strategy(diga, tom)
 
 #
 # Learned with weka.classifiers.trees.J48 -C 0.25 -M 2
@@ -75,22 +77,18 @@ with open(in1) as f:
         line = line[:-2].split('\t') # [-2] because of Windows...
         ans = line[2]
         x[u"{}\t{}".format(line[0], line[1])] = [int(ans)]
-with open(in2) as f:
-    for line in f:
-        line = line[:-1].split('\t')
-        ans = line[2]
-        x[u"{}\t{}".format(line[0], line[1])].append(int(ans))
-with open(in3) as f:
-    for line in f:
-        line = line[:-1].split('\t')
-        ans = line[2]
-        x[u"{}\t{}".format(line[0], line[1])].append(int(ans))
+for inp in inputs:
+    with open(inp) as f:
+        for line in f:
+            line = line[:-1].split('\t')
+            ans = line[2]
+            x[u"{}\t{}".format(line[0], line[1])].append(int(ans))
 
 for key in x:
     line = key.split('\t')
     # get vector
     v = x[key]
     # ans = strategy(v[0], v[1])
-    ans = strategy3(v[0], v[1], v[2])
+    ans = multi_strategy(v)
     print "{}\t{}\t{}".format(line[0], line[1], int(ans))
     
