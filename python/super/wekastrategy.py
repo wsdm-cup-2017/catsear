@@ -10,10 +10,34 @@ in1, in2, in3, out = sys.argv[1:5]
 # if(starpath >= 2) return 5; else return bound(word2vec);
 #
 def strategy(diga, tom):
-    if diga >= 5 or tom >= 5:
+    if diga >= 2 or tom >= 5:
         return 5
     else:
         return 2
+
+def stategy3(diga, tom, andre):
+    if andre < 1.5:
+        if tom < 5.5:
+            if diga < 1:
+                return round(2.71)
+            else:
+                return round(3.77)
+        else:
+            if diga < 4.5:
+                return round(4.32)
+            else:
+                return round(5.38)
+    else:
+        if andre < 5.5:
+            if diga < 1:
+                return round(5.08)
+            else:
+                return round(6)
+        else:
+            if tom < 3.5:
+                return round(5.5)
+            else:
+                return round(6.82)
 
 #
 # Learned with weka.classifiers.trees.J48 -C 0.25 -M 2
@@ -68,10 +92,7 @@ x = dict()
 with open(in1) as f:
     for line in f:
         line = line[:-2].split('\t') # [-2] because of Windows...
-        if int(line[2]) >= 2:
-            ans = "5"
-        else:
-            ans = line[2]
+        ans = line[2]
         x[u"{}#{}".format(line[0], line[1])] = [ans]
 exc = list()
 with open(in2) as f:
@@ -86,20 +107,3 @@ with open(in2) as f:
             print "{}\t{}\t{}".format(line[0], line[1], ans)
         except:
             exc.append(u"{}#{}".format(line[0], line[1]))
-with open(in3) as f:
-    for line in f:
-        line = line[:-1].split('\t')
-        try:
-            x[u"{}#{}".format(line[0], line[1])].append(line[2])
-        except:
-            exc.append(u"{}#{}".format(line[0], line[1]))
-
-# print "{} records not found: {}".format(len(exc), exc)
-
-with open(out, 'w') as f:
-    f.write('ID1,ID2,Diga,Tom,Y\n')
-    for key in sorted(x.iterkeys()):
-        s = '"' + key.replace('#', '","') + '",'
-        for v in x[key]:
-            s += "{},".format(v)
-        f.write("{}\n".format(s[:-1]))
