@@ -3,7 +3,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-in1, in2, in3, out = sys.argv[1:5]
+in1, in2, in3 = sys.argv[1:4]
 
 #
 # Nationality=0.81 & Professions=0.71
@@ -15,29 +15,10 @@ def strategy(diga, tom):
     else:
         return 2
 
-def stategy3(diga, tom, andre):
-    if andre < 1.5:
-        if tom < 5.5:
-            if diga < 1:
-                return round(2.71)
-            else:
-                return round(3.77)
-        else:
-            if diga < 4.5:
-                return round(4.32)
-            else:
-                return round(5.38)
-    else:
-        if andre < 5.5:
-            if diga < 1:
-                return round(5.08)
-            else:
-                return round(6)
-        else:
-            if tom < 3.5:
-                return round(5.5)
-            else:
-                return round(6.82)
+def strategy3(diga, tom, andre):
+    if andre == 0:
+        return strategy(diga, tom)
+    return 5
 
 #
 # Learned with weka.classifiers.trees.J48 -C 0.25 -M 2
@@ -93,17 +74,23 @@ with open(in1) as f:
     for line in f:
         line = line[:-2].split('\t') # [-2] because of Windows...
         ans = line[2]
-        x[u"{}#{}".format(line[0], line[1])] = [ans]
-exc = list()
+        x[u"{}\t{}".format(line[0], line[1])] = [int(ans)]
 with open(in2) as f:
     for line in f:
         line = line[:-1].split('\t')
-        try:
-            x[u"{}#{}".format(line[0], line[1])].append(line[2])
-            # ans = from_weka(int(line[2]))
-            # ans = bound(int(line[2]))
-            # ans = decide(int(x[u"{}#{}".format(line[0], line[1])][0]), int(line[2]))
-            ans = strategy(int(x[u"{}#{}".format(line[0], line[1])][0]), int(line[2]))
-            print "{}\t{}\t{}".format(line[0], line[1], ans)
-        except:
-            exc.append(u"{}#{}".format(line[0], line[1]))
+        ans = line[2]
+        x[u"{}\t{}".format(line[0], line[1])].append(int(ans))
+with open(in3) as f:
+    for line in f:
+        line = line[:-1].split('\t')
+        ans = line[2]
+        x[u"{}\t{}".format(line[0], line[1])].append(int(ans))
+
+for key in x:
+    line = key.split('\t')
+    # get vector
+    v = x[key]
+    # ans = strategy(v[0], v[1])
+    ans = strategy3(v[0], v[1], v[2])
+    print "{}\t{}\t{}".format(line[0], line[1], int(ans))
+    
