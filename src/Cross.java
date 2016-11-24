@@ -45,7 +45,20 @@ public class Cross {
 	 */
 	private static HashMap<String, HashMap<String, Integer>> crossNewScore(
 			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft) {
-
+		
+		HashMap<String, Integer> maxScores = new HashMap<String, Integer>();
+		hMicrosoft.keySet().forEach(subject -> {
+			// get maxima
+			HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
+			int max = Integer.MIN_VALUE;
+			for(String object : objScoreMs.keySet()) {
+				int score = objScoreMs.get(object);
+				if (score > max)
+					max = score;
+			}
+			maxScores.put(subject, max);
+		});
+		
 		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// hWSDM.keySet().parallelStream().forEach(elem ->
 		hWSDM.keySet().forEach(subject -> {
@@ -56,7 +69,8 @@ public class Cross {
 					if (objScoreMs.containsKey(obj)) {
 						HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
 						int oldScore = objScoreMs.get(obj);
-						int newScore = Math.round(2.0f * (10.0f / oldScore * 7.0f));
+						int maxScore = maxScores.get(subject);
+						int newScore = Math.round(1 + (float) oldScore / maxScore * 6.0f);
 						
 						if (ret.containsKey(subject))
 							ret.get(subject).put(obj, newScore);
