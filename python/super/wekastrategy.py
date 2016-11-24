@@ -16,11 +16,25 @@ def strategy(diga, tom):
     else:
         return 2
 
+#
+# Learned with weka.classifiers.functions.LinearRegression -S 0 -R 1.0E-8 -num-decimal-places 4
+# in 10-fold cross-validation on the union of the two datasets (all-4.csv).
+#   Correlation coefficient                  0.4758
+#   Mean absolute error                      1.8397
+#   Root mean squared error                  2.1677
+#   Total Number of Instances              677
+# 
+# Combined with the TwoFive rule (sep=3.5) gives: Nationality=0.86 & Professions=0.76
+#
 def multi_strategy(v):
-    diga, tom, dem, andre = v[0], v[1], v[2], v[3]
-    if dem >= 4:
+    diga, tom, tom_dem, andre = v[0], v[1], v[2], v[3]
+    # LinearRegression
+    ans = 0.1559 * diga + 0.5024 * tom + 0.2508 * tom_dem + 0.4361 * andre + 0.8842
+    # TwoFive rule
+    if ans > 3.5:
         return 5
-    return strategy(diga, tom)
+    else:
+        return 2
 
 #
 # Learned with weka.classifiers.trees.J48 -C 0.25 -M 2
