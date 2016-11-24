@@ -10,9 +10,9 @@ import java.util.HashMap;
 public class Cross {
 
 	public static void main(String args[]) throws IOException {
-		String wsdmFile = "wsdm.txt";
+		String wsdmFile = args[0]; // "wsdm.txt";
 		//String msFile = "msLess.txt";
-		String msFile = "ms.txt";
+		String msFile = args[1]; // "ms.txt";
 		HashMap<String, HashMap<String, Integer>> hWSDM = loadWSDMHash(wsdmFile);
 		HashMap<String, HashMap<String, Integer>> hMicrosoft = loadMSHash(msFile);
 		HashMap<String, HashMap<String, Integer>> hNewScore = crossNewScore(hWSDM, hMicrosoft);
@@ -36,8 +36,10 @@ public class Cross {
 	}
 
 	/*
-	 * MS: Barack Obama Author 44 WSDM: Barack Obama Author 3 newScore =
-	 * 2(10/44*7) newWSDM: Barack Obama Author 3
+	 * MS: Barack Obama Author 10 (max=44)
+	 * WSDM: Barack Obama Author 3
+	 * newScore = (10/44*7) = 2
+	 * newWSDM: Barack Obama Author 2
 	 * 
 	 * @
 	 */
@@ -81,9 +83,9 @@ public class Cross {
 		BufferedReader br = new BufferedReader(new FileReader(new File(msFile)));
 
 		while ((line = br.readLine()) != null) {
-			String[] elems = line.split("\\t");
-			String subject = elems[0].toLowerCase();
-			String object = elems[1].toLowerCase();
+			String[] elems = line.split("\t");
+			String subject = elems[1].toLowerCase();
+			String object = elems[0].toLowerCase();
 			int score = Integer.parseInt(elems[2]);
 			HashMap<String, Integer> objectScore = new HashMap<String, Integer>();
 
@@ -109,7 +111,7 @@ public class Cross {
 		BufferedReader br = new BufferedReader(new FileReader(new File(wsdmFile)));
 
 		while ((line = br.readLine()) != null) {
-			String[] elems = line.split("\\t");
+			String[] elems = line.split("\t");
 			String subject = elems[0].toLowerCase();
 			String object = elems[1].toLowerCase();
 			int score = Integer.parseInt(elems[2]);
