@@ -105,7 +105,7 @@ public class Cross {
 		return ret;
 	}
 
-	/*
+		/*
 	 * MS: Barack Obama Author 10 (max=44)
 	 * WSDM: Barack Obama Author 3
 	 * newScore = (10/44*7) = 2
@@ -132,14 +132,16 @@ public class Cross {
 		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// hWSDM.keySet().parallelStream().forEach(elem ->
 		hWSDM.keySet().forEach(subject -> {
-			if (hMicrosoft.containsKey(subject)) {
-				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
+			//if (hMicrosoft.containsKey(subject)) {
+			String subMs = hasSimilarSubject(hMicrosoft.keySet(), subject);
+			if(subMs != null){
+				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subMs);
 				HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
 				objScoreWSDM.keySet().forEach(obj -> {
 					if (objScoreMs.containsKey(obj)) {
 						HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
 						int oldScore = objScoreMs.get(obj);
-						int maxScore = maxScores.get(subject);
+						int maxScore = maxScores.get(subMs);
 						int newScore = Math.round(1 + (float) oldScore / maxScore * 6.0f);
 						
 						if (ret.containsKey(subject))
@@ -156,6 +158,22 @@ public class Cross {
 		return ret;
 	}
 
+	private static String hasSimilarSubject(Set<String> keySet, String subject) {
+		String ret = null;
+		double score = 0.8d;
+		for (String s : keySet) {
+			//double scoreSim = JaroWinkler.jaroWinkler(s, subject);
+			//double scoreSim = AndreMFKC.sim(s, subject, Math.max(s.length(), subject.length()));
+			double scoreSim = Jaccard.jaccard_coeffecient(s, subject);
+			if(scoreSim > score){
+				ret = s;
+				if(scoreSim == 1.0d) break;
+				score = scoreSim;
+			}
+		}
+		
+		return ret;
+	}
 	/*
 	 * 
 	 */
@@ -212,5 +230,4 @@ public class Cross {
 
 		return ret;
 	}
-
 }
