@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class Cross {
 
@@ -13,15 +14,18 @@ public class Cross {
 		String wsdmFile = args[0]; // "wsdm.txt";
 		//String msFile = "msLess.txt";
 		String msFile = args[1]; // "ms.txt";
+		String demFile = args[2];
 		HashMap<String, HashMap<String, Integer>> hWSDM = loadWSDMHash(wsdmFile);
 		HashMap<String, HashMap<String, Integer>> hMicrosoft = loadMSHash(msFile);
-		HashMap<String, HashMap<String, Integer>> hNewScore = crossNewScore(hWSDM, hMicrosoft);
-		generateFile(hNewScore, wsdmFile, msFile);
+		HashMap<String, HashMap<String, Integer>> hNewScore1 = crossNewScore(hWSDM, hMicrosoft);
+		generateFile(hNewScore1, wsdmFile, msFile, "__1");
+		HashMap<String, HashMap<String, Integer>> hNewScore2 = crossNewScoreDemonyms(hWSDM, hMicrosoft, demFile);
+		generateFile(hNewScore2, wsdmFile, msFile, "__2");
 	}
 
-	private static void generateFile(HashMap<String, HashMap<String, Integer>> hNewScore, String name1, String name2) throws FileNotFoundException, UnsupportedEncodingException {
+	private static void generateFile(HashMap<String, HashMap<String, Integer>> hNewScore, String name1, String name2, String suffix) throws FileNotFoundException, UnsupportedEncodingException {
 
-		String fileName =  name1 + "__" + name2;
+		String fileName =  name1 + "__" + name2 + suffix;
 		fileName = fileName.replaceAll(".txt", "");
 		PrintWriter writer = new PrintWriter(fileName + ".txt", "UTF-8");
 		
@@ -34,8 +38,74 @@ public class Cross {
 		});
 		writer.close();
 	}
+	
+	private static HashMap<String, HashMap<String, Integer>> crossNewScoreDemonyms(
+			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft, String demFile) throws FileNotFoundException {
+		
+		// map: country to (first) demonym
+		HashMap<String, String> dems = new HashMap<String, String>();
+		Scanner in = new Scanner(new File(demFile));
+		while (in.hasNextLine()) {
+			String[] line = in.nextLine().split("\t");
+			if (!dems.containsKey(line[0]))
+				dems.put(line[0], line[1]);
+		}
+		in.close();
+		
+		// HashMap<String, Integer> maxScores = new HashMap<String, Integer>();
+		// hMicrosoft.keySet().forEach(subject -> {
+		// 	// get maxima
+		// 	HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
+		// 	int max = Integer.MIN_VALUE;
+		// 	for(String object : objScoreMs.keySet()) {
+		// 		int score = objScoreMs.get(object);
+		// 		if (score > max)
+		// 			max = score;
+		// 	}
+		// 	maxScores.put(subject, max);
+		// });
+		
+		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
+		// hWSDM.keySet().parallelStream().forEach(elem ->
+		hWSDM.keySet().forEach(subject -> {
+			if (hMicrosoft.containsKey(subject)) {
+				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
+				HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
+				// for each target nationality...
+				objScoreWSDM.keySet().forEach(obj -> {
+					// check if a type contains the demonym
+					String dem = dems.get(obj.toLowerCase());
+					// for each Microsoft type
+					for (String type : objScoreMs.keySet()) {
+						if (type.toLowerCase().contains(dem)) {
+							System.out.println("Hey, for "+subject+", '"+type+"' contains "+dem.toUpperCase());
+							// HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
+							// int oldScore = objScoreMs.get(obj);
+							// int maxScore = maxScores.get(subject);
+							// int newScore = Math.round(1 + (float) oldScore / maxScore * 6.0f);
+							//
+							if (ret.containsKey(subject)) {
+								HashMap<String, Integer> newObjScoreWSDM = ret.get(subject);
+								if (newObjScoreWSDM.containsKey(obj)) {
+									newObjScoreWSDM.put(obj, newObjScoreWSDM.get(obj) + 1);									
+								} else {
+									newObjScoreWSDM.put(obj, 1);
+								}
+							} else {
+								HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
+								newObjScoreWSDM.put(obj, 1);
+								ret.put(subject, newObjScoreWSDM);
+							}
+						}
+					}
+				});
+			}
+		});
 
-	/*
+		return ret;
+	}
+
+		/*
 	 * MS: Barack Obama Author 10 (max=44)
 	 * WSDM: Barack Obama Author 3
 	 * newScore = (10/44*7) = 2
@@ -62,14 +132,16 @@ public class Cross {
 		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// hWSDM.keySet().parallelStream().forEach(elem ->
 		hWSDM.keySet().forEach(subject -> {
-			if (hMicrosoft.containsKey(subject)) {
-				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
+			//if (hMicrosoft.containsKey(subject)) {
+			String subMs = hasSimilarSubject(hMicrosoft.keySet(), subject);
+			if(subMs != null){
+				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subMs);
 				HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
 				objScoreWSDM.keySet().forEach(obj -> {
 					if (objScoreMs.containsKey(obj)) {
 						HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
 						int oldScore = objScoreMs.get(obj);
-						int maxScore = maxScores.get(subject);
+						int maxScore = maxScores.get(subMs);
 						int newScore = Math.round(1 + (float) oldScore / maxScore * 6.0f);
 						
 						if (ret.containsKey(subject))
@@ -86,6 +158,22 @@ public class Cross {
 		return ret;
 	}
 
+	private static String hasSimilarSubject(Set<String> keySet, String subject) {
+		String ret = null;
+		double score = 0.8d;
+		for (String s : keySet) {
+			//double scoreSim = JaroWinkler.jaroWinkler(s, subject);
+			//double scoreSim = AndreMFKC.sim(s, subject, Math.max(s.length(), subject.length()));
+			double scoreSim = Jaccard.jaccard_coeffecient(s, subject);
+			if(scoreSim > score){
+				ret = s;
+				if(scoreSim == 1.0d) break;
+				score = scoreSim;
+			}
+		}
+		
+		return ret;
+	}
 	/*
 	 * 
 	 */
@@ -142,5 +230,4 @@ public class Cross {
 
 		return ret;
 	}
-
 }

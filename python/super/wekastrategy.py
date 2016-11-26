@@ -3,14 +3,35 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-in1, in2, in3, out = sys.argv[1:5]
+in1 = sys.argv[1]
+inputs = sys.argv[2:]
 
 #
 # Nationality=0.81 & Professions=0.71
 # if(starpath >= 2) return 5; else return bound(word2vec);
 #
 def strategy(diga, tom):
-    if diga >= 5 or tom >= 5:
+    if diga >= 2 or tom >= 5:
+        return 5
+    else:
+        return 2
+
+#
+# Learned with weka.classifiers.functions.LinearRegression -S 0 -R 1.0E-8 -num-decimal-places 4
+# in 10-fold cross-validation on the union of the two datasets (all-4.csv).
+#   Correlation coefficient                  0.4758
+#   Mean absolute error                      1.8397
+#   Root mean squared error                  2.1677
+#   Total Number of Instances              677
+# 
+# Combined with the TwoFive rule (sep=3.5) gives: Nationality=0.86 & Professions=0.76
+#
+def multi_strategy(v):
+    diga, tom, tom_dem, andre = v[0], v[1], v[2], v[3]
+    # LinearRegression
+    ans = 0.1559 * diga + 0.5024 * tom + 0.2508 * tom_dem + 0.4361 * andre + 0.8842
+    # TwoFive rule
+    if ans > 3.5:
         return 5
     else:
         return 2
@@ -68,38 +89,20 @@ x = dict()
 with open(in1) as f:
     for line in f:
         line = line[:-2].split('\t') # [-2] because of Windows...
-        if int(line[2]) >= 2:
-            ans = "5"
-        else:
+        ans = line[2]
+        x[u"{}\t{}".format(line[0], line[1])] = [int(ans)]
+for inp in inputs:
+    with open(inp) as f:
+        for line in f:
+            line = line[:-1].split('\t')
             ans = line[2]
-        x[u"{}#{}".format(line[0], line[1])] = [ans]
-exc = list()
-with open(in2) as f:
-    for line in f:
-        line = line[:-1].split('\t')
-        try:
-            x[u"{}#{}".format(line[0], line[1])].append(line[2])
-            # ans = from_weka(int(line[2]))
-            # ans = bound(int(line[2]))
-            # ans = decide(int(x[u"{}#{}".format(line[0], line[1])][0]), int(line[2]))
-            ans = strategy(int(x[u"{}#{}".format(line[0], line[1])][0]), int(line[2]))
-            print "{}\t{}\t{}".format(line[0], line[1], ans)
-        except:
-            exc.append(u"{}#{}".format(line[0], line[1]))
-with open(in3) as f:
-    for line in f:
-        line = line[:-1].split('\t')
-        try:
-            x[u"{}#{}".format(line[0], line[1])].append(line[2])
-        except:
-            exc.append(u"{}#{}".format(line[0], line[1]))
+            x[u"{}\t{}".format(line[0], line[1])].append(int(ans))
 
-# print "{} records not found: {}".format(len(exc), exc)
-
-with open(out, 'w') as f:
-    f.write('ID1,ID2,Diga,Tom,Y\n')
-    for key in sorted(x.iterkeys()):
-        s = '"' + key.replace('#', '","') + '",'
-        for v in x[key]:
-            s += "{},".format(v)
-        f.write("{}\n".format(s[:-1]))
+for key in x:
+    line = key.split('\t')
+    # get vector
+    v = x[key]
+    # ans = strategy(v[0], v[1])
+    ans = multi_strategy(v)
+    print "{}\t{}\t{}".format(line[0], line[1], int(ans))
+    
