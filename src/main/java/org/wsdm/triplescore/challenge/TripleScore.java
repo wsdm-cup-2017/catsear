@@ -6,18 +6,25 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.aksw.kbox.kibe.KBox;
 import org.aksw.openqa.nlp.text.TextNLP2.Filter;
 import org.aksw.smart.starpath.indexbuilder.xingu.SCCFilter;
 import org.aksw.smart.starpath.indexbuilder.xingu.URIPatternFilter;
 import org.aksw.smart.starpath.indexbuilder.xingu.scorer.JaccardLabelStarpathSCCScorer;
 import org.aksw.smart.starpath.xingu.qald.benchmark.SCCFilterList;
 import org.dbtrends.scc.Knowledgebase;
+import org.dbtrends.scc.Literal;
 import org.dbtrends.scc.Property;
 import org.dbtrends.scc.SCC;
 import org.dbtrends.scc.URIObject;
+
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 /**
  * 
@@ -42,7 +49,7 @@ public class TripleScore {
 	private final static String DBP_PROFESSION = "http://dbpedia.org/property/profession";
 	
 	private final static Integer SOME_EVIDENCE = 5; // Range from 3 to 7
-	private final static Integer FULL_EVIDENCE = 5; // Range from 3 to 7
+	private final static Integer FULL_EVIDENCE = 7; // Range from 3 to 7
 	
 	public static void main(String[] args) {
 		
@@ -74,6 +81,7 @@ public class TripleScore {
 				}
 		    }
 			processEntries(entries);
+			print(ps, entries); // printing output
 		}
 	}
 	
@@ -93,11 +101,13 @@ public class TripleScore {
 			try {
 				score = getProfessionScore(e); // we have to try either Profession or Nationality
 			} catch (Exception e2) {
+				e2.printStackTrace();
 			}							
 			if(score == null) { // if score is null, maybe is nationality
 				try {
 					score = getNationalityScore(e);
 				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
 			}
 			e.setScore(score);
@@ -111,7 +121,10 @@ public class TripleScore {
 				Filter.STEM,
 				Filter.YAGO,
 				Filter.UNDERSCORE};
-		String[] properties = new String[] {RDF_TYPE, DBP_OCCUPATION, DBO_PROFESSION, DBP_PROFESSION};		
+		String[] properties = new String[] {RDF_TYPE,
+				DBP_OCCUPATION,
+				DBO_PROFESSION,
+				DBP_PROFESSION};
 		return score(entryURL, entry.getObject(), filters, properties);
 	}
 	
@@ -181,6 +194,14 @@ public class TripleScore {
 				properties);
 		
 		SCC scc = Knowledgebase.DBpedia39.getSCC(entityURL);
+		List<String> entityTypes = getTypes(entityURL);
+		for(String entityType : entityTypes) {
+			Property p = new Property("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", 
+					null,
+					entityType,
+					new ArrayList<Literal>());
+			scc.addProperty(p);
+		}
 		if(scc == null) {
 			return null; // can't be found
 		}
@@ -192,13 +213,29 @@ public class TripleScore {
 				0,
 				langs,
 				labels,
-				types);
+				types);		
 		if(score >= 1) { // full match
 			return FULL_EVIDENCE;
 		} else if(score > 0) { // partial match
 			return SOME_EVIDENCE;
 		}
 		return null; // don't know
+	}
+	
+	private static List<String> getTypes(String resourceURI) throws MalformedURLException, Exception {
+		List<String> types = new ArrayList<String>();
+		com.hp.hpl.jena.query.ResultSet rs = KBox.query("Select ?type where {<" + resourceURI + ">"
+		  + " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+		  +  " ?type }", true,
+		  new URL[]{new URL("http://dbpedia.org/2015_10/yago_types")});
+		
+		while(rs.hasNext()) {
+			QuerySolution qs = rs.nextSolution();
+			RDFNode type = qs.get("type");
+			types.add(type.toString());
+		}
+		
+		return types;
 	}
 	
 	private static void print(PrintStream ps, List<Entry> entries) {
@@ -209,7 +246,7 @@ public class TripleScore {
 
 	public static Entry parseLine(String line) throws LineParseException {
 		String[] params = line.split("\\t");
-		if(params.length > 2) {
+		if(params.length >= 2) {
 			Entry entry = new Entry();
 			entry.setSubject(params[0]);
 			entry.setObject(params[1]);
