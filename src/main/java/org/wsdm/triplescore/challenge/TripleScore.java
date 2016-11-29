@@ -200,6 +200,9 @@ public class TripleScore {
 				properties);
 		
 		SCC scc = Knowledgebase.DBpedia39.getSCC(entityURL);
+		if(scc == null) {
+			return null; // can't be found
+		}
 		List<String> entityTypes = getTypes(entityURL);
 		for(String entityType : entityTypes) {
 			Property p = new Property("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", 
@@ -207,9 +210,6 @@ public class TripleScore {
 					entityType,
 					new ArrayList<Literal>());
 			scc.addProperty(p);
-		}
-		if(scc == null) {
-			return null; // can't be found
 		}
 		double score = scorer.compute(object,
 				entityFilter,
