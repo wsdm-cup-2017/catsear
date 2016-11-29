@@ -13,4 +13,10 @@ public class TripleScoreTest {
 		ts.score("C:/Users/emarx/workspaces/starpath/WSDMTripleScoreChallenge/src/test/resources/profession.train.txt", "profession-out.txt");
 		ts.score("C:/Users/emarx/workspaces/starpath/WSDMTripleScoreChallenge/src/test/resources/nationality.train.txt", "nationality-out.txt");
 	}
+	
+	@Test
+	public void testRun2() throws FileNotFoundException, IOException {
+		TripleScore ts = new TripleScore();
+		ts.score("C:/Users/emarx/workspaces/starpath/WSDMTripleScoreChallenge/src/test/resources/profession.train.small.txt", "profession-out.small.txt");
+	}
 }

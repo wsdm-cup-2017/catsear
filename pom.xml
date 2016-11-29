@@ -130,6 +130,11 @@
         <systemPath>${project.basedir}/libs/starpath.indexbuilder.xingu.jar</systemPath>
       </dependency>
       <dependency>
+	    <groupId>junit</groupId>
+	    <artifactId>junit</artifactId>
+	    <version>4.12</version>
+	  </dependency>
+      <dependency>
         <groupId>org.aksw.starpath</groupId>
         <artifactId>starpah.benchmark</artifactId>
         <version>v0.0.1-beta</version>

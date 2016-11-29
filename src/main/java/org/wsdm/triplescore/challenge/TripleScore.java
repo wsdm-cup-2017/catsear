@@ -51,8 +51,14 @@ public class TripleScore {
 	private final static Integer SOME_EVIDENCE = 5; // Range from 3 to 7
 	private final static Integer FULL_EVIDENCE = 7; // Range from 3 to 7
 	
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		if(args.length != 2) {
+			System.out.println("use java -jar triplescore <inputFile> <outputFile>");
+		} else {
+			String inputFilePath = args[0];
+			String outputFilePath = args[1];
+			score(inputFilePath, outputFilePath);
+		}
 	}
 	
 	public static void score(String inputFilePath, String outputFilePath) throws FileNotFoundException, IOException {
