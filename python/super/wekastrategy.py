@@ -1,11 +1,12 @@
 import sys
+import os
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 thr = float(sys.argv[1])
-out = sys.argv[2] + "/" + os.path.basename()
-inputs = sys.argv[3:]
+out = sys.argv[3] + "/" + os.path.basename(sys.argv[2])
+inputs = sys.argv[4:]
 
 #
 # Nationality=0.81 & Professions=0.71
