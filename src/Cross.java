@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Cross {
 
@@ -18,16 +19,14 @@ public class Cross {
 		HashMap<String, HashMap<String, Integer>> hWSDM = loadWSDMHash(wsdmFile);
 		HashMap<String, HashMap<String, Integer>> hMicrosoft = loadMSHash(msFile);
 		HashMap<String, HashMap<String, Integer>> hNewScore1 = crossNewScore(hWSDM, hMicrosoft);
-		generateFile(hNewScore1, wsdmFile, msFile, "__1");
+		generateFile(hNewScore1, wsdmFile, msFile, "../predictions-4.txt");
 		HashMap<String, HashMap<String, Integer>> hNewScore2 = crossNewScoreDemonyms(hWSDM, hMicrosoft, demFile);
-		generateFile(hNewScore2, wsdmFile, msFile, "__2");
+		generateFile(hNewScore2, wsdmFile, msFile, "../predictions-5.txt");
 	}
 
-	private static void generateFile(HashMap<String, HashMap<String, Integer>> hNewScore, String name1, String name2, String suffix) throws FileNotFoundException, UnsupportedEncodingException {
+	private static void generateFile(HashMap<String, HashMap<String, Integer>> hNewScore, String name1, String name2, String outFile) throws FileNotFoundException, UnsupportedEncodingException {
 
-		String fileName =  name1 + "__" + name2 + suffix;
-		fileName = fileName.replaceAll(".txt", "");
-		PrintWriter writer = new PrintWriter(fileName + ".txt", "UTF-8");
+		PrintWriter writer = new PrintWriter(outFile, "UTF-8");
 		
 		hNewScore.keySet().forEach(subject -> {
 			HashMap<String, Integer> hObjScore = hNewScore.get(subject);
