@@ -104,7 +104,7 @@ public class Cross {
 		return ret;
 	}
 
-		/*
+	/*
 	 * MS: Barack Obama Author 10 (max=44)
 	 * WSDM: Barack Obama Author 3
 	 * newScore = (10/44*7) = 2
@@ -131,16 +131,16 @@ public class Cross {
 		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// hWSDM.keySet().parallelStream().forEach(elem ->
 		hWSDM.keySet().forEach(subject -> {
-			//if (hMicrosoft.containsKey(subject)) {
-			String subMs = hasSimilarSubject(hMicrosoft.keySet(), subject);
-			if(subMs != null){
-				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subMs);
+			if (hMicrosoft.containsKey(subject)) {
+			//String subMs = hasSimilarSubject(hMicrosoft.keySet(), subject);
+			//if(subMs != null){
+				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
 				HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
 				objScoreWSDM.keySet().forEach(obj -> {
 					if (objScoreMs.containsKey(obj)) {
 						HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
 						int oldScore = objScoreMs.get(obj);
-						int maxScore = maxScores.get(subMs);
+						int maxScore = maxScores.get(subject);
 						int newScore = Math.round(1 + (float) oldScore / maxScore * 6.0f);
 						
 						if (ret.containsKey(subject))
