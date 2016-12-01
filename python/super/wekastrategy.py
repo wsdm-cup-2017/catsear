@@ -3,8 +3,9 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-in1 = sys.argv[1]
-inputs = sys.argv[2:]
+thr = float(sys.argv[1])
+out = sys.argv[2] + "/" + os.path.basename()
+inputs = sys.argv[3:]
 
 #
 # Nationality=0.81 & Professions=0.71
@@ -29,9 +30,20 @@ def strategy(diga, tom):
 def multi_strategy(v):
     diga, tom, tom_dem, andre = v[0], v[1], v[2], v[3]
     # LinearRegression
-    ans = 0.1559 * diga + 0.5024 * tom + 0.2508 * tom_dem + 0.4361 * andre + 0.8842
+    ans = 0.5245 * diga + 0.4532 * tom + 0.3513 * tom_dem + 0.3824 * andre + (-0.5606)
     # TwoFive rule
-    if ans > 3.5:
+    global thr
+    if ans > thr:
+        return 5
+    else:
+        return 2
+
+def as_binary(v):
+    diga, tom, tom_dem, andre = v[0], v[1], v[2], v[3]
+    # SMO
+    ans = (0.5715) * diga + (0.2853) * tom + (0.4) * tom_dem + (0.5707) * andre + (-3.57)
+    global thr
+    if ans > thr:
         return 5
     else:
         return 2
@@ -86,23 +98,23 @@ def from_weka(tom):
     return int(round(value))
 
 x = dict()
-with open(in1) as f:
-    for line in f:
-        line = line[:-2].split('\t') # [-2] because of Windows...
-        ans = line[2]
-        x[u"{}\t{}".format(line[0], line[1])] = [int(ans)]
 for inp in inputs:
     with open(inp) as f:
         for line in f:
             line = line[:-1].split('\t')
             ans = line[2]
-            x[u"{}\t{}".format(line[0], line[1])].append(int(ans))
+            key = u"{}\t{}".format(line[0], line[1])
+            if key not in x:
+                x[key] = []
+            x[key].append(int(ans))
 
-for key in x:
-    line = key.split('\t')
-    # get vector
-    v = x[key]
-    # ans = strategy(v[0], v[1])
-    ans = multi_strategy(v)
-    print "{}\t{}\t{}".format(line[0], line[1], int(ans))
+with open(out, 'w') as f:
+    for key in x:
+        line = key.split('\t')
+        # get vector
+        v = x[key]
+        # ans = strategy(v[0], v[1])
+        ans = multi_strategy(v)
+        # ans = as_binary(v)
+        f.write("{}\t{}\t{}\n".format(line[0], line[1], int(ans)))
     
