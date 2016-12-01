@@ -6,9 +6,9 @@ import re
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-# input file
+# input file (named as <predicate>.<extension>)
 inp = sys.argv[1]
-# ref
+# ref directory
 ref = sys.argv[2]
 # output file 1
 out1 = sys.argv[3]
@@ -35,7 +35,14 @@ def load_demonyms():
 
 def load_possible():
     x_list = list()
-    with open(ref) as f:
+    if "profession" in inp:
+        name = "/professions"
+    else:
+        if "nationality" in inp:
+            name = "/nationalities"
+        else:
+            sys.exit("Predicate not supported.")
+    with open(ref + name) as f:
         for line in f:
             x_list.append(line[:-1])
     return x_list
