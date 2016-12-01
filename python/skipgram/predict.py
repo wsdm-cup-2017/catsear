@@ -14,8 +14,18 @@ ref = sys.argv[2]
 out1 = sys.argv[3]
 # output file 2
 out2 = sys.argv[4]
-# force lowercase
-flc = sys.argv[5]
+
+if "profession" in inp:
+    name = "/professions"
+    # force lowercase
+    flc = True
+else:
+    if "nationality" in inp:
+        name = "/nationalities"
+        flc = False
+    else:
+        sys.exit("Predicate not supported.")
+
 
 def load_demonyms():
     dem = dict()
@@ -35,13 +45,6 @@ def load_demonyms():
 
 def load_possible():
     x_list = list()
-    if "profession" in inp:
-        name = "/professions"
-    else:
-        if "nationality" in inp:
-            name = "/nationalities"
-        else:
-            sys.exit("Predicate not supported.")
     with open(ref + name) as f:
         for line in f:
             x_list.append(line[:-1])
@@ -98,7 +101,7 @@ with open(out1, 'w') as f1:
                 dsims = dict()
                 # for each possible object...
                 for x_x in x_list:
-                    if flc == "True":
+                    if flc:
                         s = x_x.lower()
                     else:
                         s = x_x
@@ -115,7 +118,7 @@ with open(out1, 'w') as f1:
                     if x_x in dem:
                         # for each demonym...
                         for form in dem[x_x]:
-                            if flc == "True":
+                            if flc:
                                 s = form.lower()
                             else:
                                 s = form
