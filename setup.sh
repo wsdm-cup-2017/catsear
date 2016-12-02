@@ -8,9 +8,8 @@ rm foo.train foo.txt
 wget http://tsoru.aksw.org/public/wsdmcup/instance-sentences.bin -O python/skipgram/instance-sentences.bin
 # download and extract MS graph
 wget http://tsoru.aksw.org/public/wsdmcup/Microsoft-Concept-Graph.zip
-unzip Microsoft-Concept-Graph.zip
-# compile Java
-cd src
-javac Cross.java
-javac Jaccard.java
+unzip Microsoft-Concept-Graph.zip -d graph-cross
+# compile graph-cross
+cd graph-cross
+mvn compile package
 cd ..
