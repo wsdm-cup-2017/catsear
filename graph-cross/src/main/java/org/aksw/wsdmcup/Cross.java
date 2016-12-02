@@ -7,11 +7,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Set;
 
-import redis.clients.jedis.Jedis;
 
 /**
  * @author Andre Valdestilhas <valdestilhas@informatik.uni-leipzig.de>
@@ -20,30 +20,41 @@ import redis.clients.jedis.Jedis;
  */
 public class Cross {
 	
-	private static Jedis jedis;
-
-	public static void main(String args[]) throws IOException {
-		String wsdmFile = args[0]; // "wsdm.txt";
-		//String msFile = "msLess.txt";
-		String msFile = args[1]; // "ms.txt";
+	private static SQLiteManager sql;
+	
+	public static void main(String args[]) throws IOException, ClassNotFoundException, SQLException {
+		
+		String scope = args[0];
+		switch(scope) {
+		case "cross":
+			// continue in this class...
+			break;
+		case "build":
+			GraphToSQL.main(new String[] { args[1] });
+			return;
+		default:
+			return;
+		}
+		
+		String wsdmFile = args[1]; // "wsdm.txt";
 		String demFile = args[2];
 		
-		jedis = new Jedis("localhost");
-		jedis.flushDB();
+		sql = new SQLiteManager("msgraph.db", false);
 		
 		System.out.println("Loading WSDM set...");
 		HashMap<String, HashMap<String, Integer>> hWSDM = loadWSDMHash(wsdmFile);
-		System.out.println("Indexing MS set...");
-		HashMap<String, HashMap<String, Integer>> hMicrosoft = loadMSHash(msFile);
+//		System.out.println("Indexing MS set...");
+//		HashMap<String, HashMap<String, Integer>> hMicrosoft = loadMSHash(msFile);
+		HashMap<String, HashMap<String, Integer>> hMicrosoft = null;
 		System.out.println("Generating predictions-4...");
 		HashMap<String, HashMap<String, Integer>> hNewScore1 = crossNewScore(hWSDM, hMicrosoft);
-		generateFile(hNewScore1, wsdmFile, msFile, "predictions-4.txt");
+		generateFile(hNewScore1, wsdmFile, "predictions-4.txt");
 		System.out.println("Generating predictions-5...");
 		HashMap<String, HashMap<String, Integer>> hNewScore2 = crossNewScoreDemonyms(hWSDM, hMicrosoft, demFile);
-		generateFile(hNewScore2, wsdmFile, msFile, "predictions-5.txt");
+		generateFile(hNewScore2, wsdmFile, "predictions-5.txt");
 	}
 
-	private static void generateFile(HashMap<String, HashMap<String, Integer>> hNewScore, String name1, String name2, String outFile) throws FileNotFoundException, UnsupportedEncodingException {
+	private static void generateFile(HashMap<String, HashMap<String, Integer>> hNewScore, String name1, String outFile) throws FileNotFoundException, UnsupportedEncodingException {
 
 		PrintWriter writer = new PrintWriter(outFile, "UTF-8");
 		
@@ -58,7 +69,7 @@ public class Cross {
 	}
 	
 	private static HashMap<String, HashMap<String, Integer>> crossNewScoreDemonyms(
-			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft, String demFile) throws FileNotFoundException {
+			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft, String demFile) throws FileNotFoundException, SQLException {
 		
 		// map: country to (first) demonym
 		HashMap<String, String> dems = new HashMap<String, String>();
@@ -70,40 +81,25 @@ public class Cross {
 		}
 		in.close();
 		
-		// HashMap<String, Integer> maxScores = new HashMap<String, Integer>();
-		// hMicrosoft.keySet().forEach(subject -> {
-		// 	// get maxima
-		// 	HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
-		// 	int max = Integer.MIN_VALUE;
-		// 	for(String object : objScoreMs.keySet()) {
-		// 		int score = objScoreMs.get(object);
-		// 		if (score > max)
-		// 			max = score;
-		// 	}
-		// 	maxScores.put(subject, max);
-		// });
-		
 		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// hWSDM.keySet().parallelStream().forEach(elem ->
-		hWSDM.keySet().forEach(subject -> {
-			HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
-			objScoreWSDM.keySet().forEach(obj -> {
-//				if (hMicrosoft.containsKey(subject)) {
-				if (jedis.exists(subject + "#" + obj)) {
+		for(String subject : hWSDM.keySet()) {
+			Set<String> keySet = sql.getObjects(subject);
+//			if (hMicrosoft.containsKey(subject)) {
+			if (!keySet.isEmpty()) {
+				HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
+				// for each target nationality...
+				for (String obj : objScoreWSDM.keySet()) {
 //					HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
-					// for each target nationality...
 					// check if a type contains the demonym
 					String dem = dems.get(obj.toLowerCase());
 					// for each Microsoft type
 //					for (String type : objScoreMs.keySet()) {
-					String type = obj;
+					for (String key : keySet) {
+						String type = key;
+						System.out.println(subject + " => " + dem + " => " + type);
 						if (type.toLowerCase().contains(dem)) {
 							System.out.println("Hey, for "+subject+", '"+type+"' contains "+dem.toUpperCase());
-							// HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
-							// int oldScore = objScoreMs.get(obj);
-							// int maxScore = maxScores.get(subject);
-							// int newScore = Math.round(1 + (float) oldScore / maxScore * 6.0f);
-							//
 							if (ret.containsKey(subject)) {
 								HashMap<String, Integer> newObjScoreWSDM = ret.get(subject);
 								if (newObjScoreWSDM.containsKey(obj)) {
@@ -117,10 +113,10 @@ public class Cross {
 								ret.put(subject, newObjScoreWSDM);
 							}
 						}
-//					}
+					}
 				}
-			});
-		});
+			}
+		}
 
 		return ret;
 	}
@@ -134,53 +130,41 @@ public class Cross {
 	 * @
 	 */
 	private static HashMap<String, HashMap<String, Integer>> crossNewScore(
-			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft) {
-		
-		
-		
-//		HashMap<String, Integer> maxScores = new HashMap<String, Integer>();
-//		hMicrosoft.keySet().forEach(subject -> {
-//			// get maxima
-//			HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
-//			int max = Integer.MIN_VALUE;
-//			for(String object : objScoreMs.keySet()) {
-//				int score = objScoreMs.get(object);
-//				if (score > max)
-//					max = score;
-//			}
-//			maxScores.put(subject, max);
-//		});
-		
+			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft) throws SQLException {
+				
 		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// hWSDM.keySet().parallelStream().forEach(elem ->
-		hWSDM.keySet().forEach(subject -> {
+		for(String subject : hWSDM.keySet()) {
 			
 //			if (hMicrosoft.containsKey(subject)) {
 			//String subMs = hasSimilarSubject(hMicrosoft.keySet(), subject);
 			//if(subMs != null){
 //				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
 				
-				HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
-				objScoreWSDM.keySet().forEach(obj -> {
-//					if (objScoreMs.containsKey(obj)) {
-					if (jedis.exists(subject + "#" + obj)) {
-						HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
-//						int oldScore = objScoreMs.get(obj);
-						int oldScore = Integer.parseInt(jedis.get(subject + "#" + obj));
-//						int maxScore = maxScores.get(subject);
-						int maxScore = Integer.parseInt(jedis.get("MAX::" + subject));
-						int newScore = Math.round(1 + (float) oldScore / maxScore * 6.0f);
-						
-						if (ret.containsKey(subject))
-							ret.get(subject).put(obj, newScore);
-						else {
-							newObjScoreWSDM.put(obj, newScore);
-							ret.put(subject, newObjScoreWSDM);
+				SQLObject s = sql.getEverything(subject);
+				System.out.println(subject);
+				if(!s.isEmpty()) {
+					HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
+					for (String obj : objScoreWSDM.keySet()) {
+	//					if (objScoreMs.containsKey(obj)) {
+						Integer oldScore = s.getScore(obj);
+						if (oldScore != null) {
+							HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
+	//						int oldScore = objScoreMs.get(obj);
+	//						int maxScore = maxScores.get(subject);
+							int newScore = Math.round(1 + (float) oldScore / s.getMax() * 6.0f);
+							
+							if (ret.containsKey(subject))
+								ret.get(subject).put(obj, newScore);
+							else {
+								newObjScoreWSDM.put(obj, newScore);
+								ret.put(subject, newObjScoreWSDM);
+							}
 						}
 					}
-				});
+				}
 //			}
-		});
+		}
 
 		return ret;
 	}
@@ -202,13 +186,15 @@ public class Cross {
 		
 		return ret;
 	}
+	
 	/*
 	 * 
 	 */
+	@SuppressWarnings("unused")
 	private static HashMap<String, HashMap<String, Integer>> loadMSHash(String msFile)
 			throws NumberFormatException, IOException {
 		String line;
-//		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
+		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// load each line and append it to file.
 		BufferedReader br = new BufferedReader(new FileReader(new File(msFile)));
 
@@ -217,32 +203,20 @@ public class Cross {
 			String subject = elems[1].toLowerCase();
 			String object = elems[0].toLowerCase();
 			int score = Integer.parseInt(elems[2]);
-//			HashMap<String, Integer> objectScore = new HashMap<String, Integer>();
+			HashMap<String, Integer> objectScore = new HashMap<String, Integer>();
 
-//			if (ret.containsKey(subject))
-//				ret.get(subject).put(object, score);
-//			else {
-//				objectScore.put(object, score);
-//				ret.put(subject, objectScore);
-//			}
-			
-			String key = subject + "#" + object;
-			jedis.set(key, String.valueOf(score));
-			
-			String mkey = "MAX::" + subject;
-			if(jedis.exists(mkey)) {
-				int old = Integer.parseInt(jedis.get(mkey));
-				if(score > old)
-					jedis.set(mkey, String.valueOf(score));
-			} else {
-				jedis.set(mkey, String.valueOf(score));
+			if (ret.containsKey(subject))
+				ret.get(subject).put(object, score);
+			else {
+				objectScore.put(object, score);
+				ret.put(subject, objectScore);
 			}
+			
 			
 		}
 		br.close();
 
-//		return ret;
-		return null;
+		return ret;
 	}
 
 	/*
