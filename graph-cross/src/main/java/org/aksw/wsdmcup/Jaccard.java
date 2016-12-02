@@ -1,9 +1,22 @@
+package org.aksw.wsdmcup;
+
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 
+/**
+ * @author Andre Valdestilhas <valdestilhas@informatik.uni-leipzig.de>
+ * @author Tommaso Soru <tsoru@informatik.uni-leipzig.de>
+ *
+ */
 public class Jaccard {
-	// http://bytes4u.blogspot.com/2013/03/jaccard-coeffecient-and-implementation.html
+	
+	/**
+	 * Source: http://bytes4u.blogspot.com/2013/03/jaccard-coeffecient-and-implementation.html
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
 	public static double jaccard_coeffecient(String s1, String s2) {
 
 		double j_coeffecient;
@@ -30,18 +43,18 @@ public class Jaccard {
 			i++;
 		}
 
-		Iterator<String> itr1 = j1.iterator();
-		while (itr1.hasNext()) {
-			String element = itr1.next();
-			//System.out.print(element + " ");
-		}
-		//System.out.println();
-		Iterator<String> itr2 = j2.iterator();
-		while (itr2.hasNext()) {
-			String element = itr2.next();
-			//System.out.print(element + " ");
-		}
-		//System.out.println();
+//		Iterator<String> itr1 = j1.iterator();
+//		while (itr1.hasNext()) {
+//			String element = itr1.next();
+//			System.out.print(element + " ");
+//		}
+//		System.out.println();
+//		Iterator<String> itr2 = j2.iterator();
+//		while (itr2.hasNext()) {
+//			String element = itr2.next();
+//			System.out.print(element + " ");
+//		}
+//		System.out.println();
 
 		set2.addAll(j2);
 		set2.addAll(j1);

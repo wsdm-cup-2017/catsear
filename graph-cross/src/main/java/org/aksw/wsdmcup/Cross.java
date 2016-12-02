@@ -1,3 +1,5 @@
+package org.aksw.wsdmcup;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,6 +11,11 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * @author Andre Valdestilhas <valdestilhas@informatik.uni-leipzig.de>
+ * @author Tommaso Soru <tsoru@informatik.uni-leipzig.de>
+ *
+ */
 public class Cross {
 
 	public static void main(String args[]) throws IOException {
@@ -157,6 +164,7 @@ public class Cross {
 		return ret;
 	}
 
+	@SuppressWarnings("unused")
 	private static String hasSimilarSubject(Set<String> keySet, String subject) {
 		String ret = null;
 		double score = 0.8d;
