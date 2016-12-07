@@ -6,6 +6,7 @@
 #	./catsear.sh -i <inputfile1> [-i <inputfile2> ...] -o <outputdir>
 #
 trData="/media/training-datasets/triple-scoring/wsdmcup17-triple-scoring-training-dataset-2016-09-16"
+export PATH=$PATH:/home/catsear/anaconda2/bin/
 
 while [[ $# -gt 1 ]]
   do
