@@ -43,7 +43,7 @@ for inp in "${input[@]}"
 	cd ../..
 	
 	# predictions from (4) Microsoft Concept Graph
-	cd src
+	cd graph-cross
 	java -Xmx4g -jar target/graph-cross-0.0.2-SNAPSHOT-jar-with-dependencies.jar cross ${inp} ../python/skipgram/demonyms/demonyms.clean.tsv
 	cd ..
 	
