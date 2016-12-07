@@ -99,6 +99,17 @@ def from_weka(tom):
     return int(round(value))
 
 x = dict()
+x2 = list()
+with open(inp0) as f:
+    for line in f:
+        line = line[:-1].split('\t')
+        ans = line[2]
+        key = u"{}\t{}".format(line[0], line[1])
+        x2.append(key)
+        if key not in x:
+            x[key] = []
+        x[key].append(int(ans))
+
 for inp in inputs:
     with open(inp) as f:
         for line in f:
@@ -110,7 +121,7 @@ for inp in inputs:
             x[key].append(int(ans))
 
 with open(out, 'w') as f:
-    for key in x:
+    for key in x2:
         line = key.split('\t')
         # get vector
         v = x[key]
