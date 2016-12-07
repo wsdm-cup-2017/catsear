@@ -44,11 +44,13 @@ for inp in "${input[@]}"
 	
 	# predictions from (4) Microsoft Concept Graph
 	cd graph-cross
-	java -Xmx4g -jar target/graph-cross-0.0.2-SNAPSHOT-jar-with-dependencies.jar cross ${inp} ../python/skipgram/demonyms/demonyms.clean.tsv
+	java -Xmx4g -jar target/graph-cross-0.0.2-SNAPSHOT-jar-with-dependencies.jar cross ${inp} ../python/skipgram/demonyms/demonyms.clean.tsv > /dev/null
 	cd ..
+	python python/msgraph/to_original.py graph-cross/predictions-4.txt ${inp} > predictions-4.txt
+	python python/msgraph/to_original.py graph-cross/predictions-5.txt ${inp} > predictions-5.txt
 	
 	# super-classifier
 	# write output to ${output}/${inp}
-	python python/super/wekastrategy.py 3.4 ${inp} ${output} predictions-1.txt predictions-2.txt predictions-3.txt predictions-4.txt
+	python python/super/wekastrategy.py 3.4 ${inp} ${output} predictions-1.txt predictions-2.txt predictions-3.txt predictions-4.txt predictions-5.txt
 	
 done
