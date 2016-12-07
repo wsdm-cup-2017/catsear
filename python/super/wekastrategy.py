@@ -6,7 +6,8 @@ sys.setdefaultencoding("utf-8")
 
 thr = float(sys.argv[1])
 out = sys.argv[3] + "/" + os.path.basename(sys.argv[2])
-inputs = sys.argv[4:]
+inp0 = sys.argv[4]
+inputs = sys.argv[5:]
 
 #
 # Nationality=0.81 & Professions=0.71
@@ -29,9 +30,15 @@ def strategy(diga, tom):
 # Combined with the TwoFive rule (sep=3.5) gives: Nationality=0.86 & Professions=0.76
 #
 def multi_strategy(v):
-    diga, tom, tom_dem, andre = v[0], v[1], v[2], v[3]
+    diga, tom, tom_dem, andre, andre_dem = v[0], v[1], v[2], v[3], v[4]
+    if diga == 0:
+        diga = 2
+    if diga == 5:
+        diga = 3
+    if diga == 7:
+        diga = 5
     # LinearRegression
-    ans = 0.5245 * diga + 0.4532 * tom + 0.3513 * tom_dem + 0.3824 * andre + (-0.5606)
+    ans = 0.5245 * diga + 0.4532 * tom + 0.3513 * tom_dem + 0.3824 * andre + 0.3824 * andre_dem + (-0.5606)
     # TwoFive rule
     global thr
     if ans > thr:
