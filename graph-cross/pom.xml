@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.aksw.wsdmcup</groupId>
 	<artifactId>graph-cross</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>Graph-Cross</name>
 	<build>
 		<plugins>
@@ -51,6 +51,13 @@
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aksw.kbox</groupId>
+			<artifactId>kbox.kibe</artifactId>
+			<version>v0.0.1-alpha2</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../libs/kbox-v0.0.1-alpha2.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>

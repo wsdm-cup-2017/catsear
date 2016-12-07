@@ -44,7 +44,7 @@ for inp in "${input[@]}"
 	
 	# predictions from (4) Microsoft Concept Graph
 	cd src
-	java -Xmx32g Cross ${inp} ../data-concept/data-concept-instance-relations.txt ../python/skipgram/demonyms/demonyms.clean.tsv
+	java -Xmx4g -jar target/graph-cross-0.0.2-SNAPSHOT-jar-with-dependencies.jar cross ${inp} ../python/skipgram/demonyms/demonyms.clean.tsv
 	cd ..
 	
 	# super-classifier

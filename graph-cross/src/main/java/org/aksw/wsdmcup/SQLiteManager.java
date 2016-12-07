@@ -141,7 +141,7 @@ public class SQLiteManager {
 		return set;
 	}
 	
-	public SQLObject getEverything(String subject) throws SQLException {
+	public KBObject getEverything(String subject) throws SQLException {
 		
 		subject = strip(subject);
 		
@@ -154,51 +154,8 @@ public class SQLiteManager {
 			map.put(rs.getString("obj"), rs.getInt("score"));
 		}
 
-		return new SQLObject(subject, map);
+		return new KBObject(subject, map);
 		
 	}
 
-}
-
-class SQLObject {
-	
-	private String subject;
-	private HashMap<String, Integer> objects;
-	private Integer max;
-	
-	public SQLObject(String subject, HashMap<String, Integer> objects) {
-		this.subject = subject;
-		this.objects = objects;
-		
-		Integer max = Integer.MIN_VALUE;
-		for(Integer i : objects.values())
-			if(i > max)
-				max = i;
-		this.max = max;
-	}
-	
-	public boolean isEmpty() {
-		return objects.isEmpty();
-	}
-	
-	public Integer getScore(String object) {
-		return objects.get(object);
-	}
-	
-	public Set<String> getObjects() {
-		return objects.keySet();
-	}
-
-	public String getSubject() {
-		return subject;
-	}
-
-	public HashMap<String, Integer> getObjectsMap() {
-		return objects;
-	}
-
-	public Integer getMax() {
-		return max;
-	}
-	
 }

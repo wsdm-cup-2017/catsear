@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.aksw.kbox.kibe.KBox;
+
 
 /**
  * @author Andre Valdestilhas <valdestilhas@informatik.uni-leipzig.de>
@@ -20,9 +22,10 @@ import java.util.Set;
  */
 public class Cross {
 	
-	private static SQLiteManager sql;
+//	private static SQLiteManager sql;
+	private static KBoxHandler kbox;
 	
-	public static void main(String args[]) throws IOException, ClassNotFoundException, SQLException {
+	public static void main(String args[]) throws Exception {
 		
 		String scope = args[0];
 		switch(scope) {
@@ -39,7 +42,8 @@ public class Cross {
 		String wsdmFile = args[1]; // "wsdm.txt";
 		String demFile = args[2];
 		
-		sql = new SQLiteManager("msgraph.db", false);
+//		sql = new SQLiteManager("msgraph.db", false);
+		kbox = new KBoxHandler();
 		
 		System.out.println("Loading WSDM set...");
 		HashMap<String, HashMap<String, Integer>> hWSDM = loadWSDMHash(wsdmFile);
@@ -69,7 +73,7 @@ public class Cross {
 	}
 	
 	private static HashMap<String, HashMap<String, Integer>> crossNewScoreDemonyms(
-			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft, String demFile) throws FileNotFoundException, SQLException {
+			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft, String demFile) throws Exception {
 		
 		// map: country to (first) demonym
 		HashMap<String, String> dems = new HashMap<String, String>();
@@ -84,7 +88,8 @@ public class Cross {
 		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// hWSDM.keySet().parallelStream().forEach(elem ->
 		for(String subject : hWSDM.keySet()) {
-			Set<String> keySet = sql.getObjects(subject);
+//			Set<String> keySet = sql.getObjects(subject);
+			Set<String> keySet = kbox.getObjects(subject);
 //			if (hMicrosoft.containsKey(subject)) {
 			if (!keySet.isEmpty()) {
 				HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
@@ -93,24 +98,26 @@ public class Cross {
 //					HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
 					// check if a type contains the demonym
 					String dem = dems.get(obj.toLowerCase());
-					// for each Microsoft type
-//					for (String type : objScoreMs.keySet()) {
-					for (String key : keySet) {
-						String type = key;
-						System.out.println(subject + " => " + dem + " => " + type);
-						if (type.toLowerCase().contains(dem)) {
-							System.out.println("Hey, for "+subject+", '"+type+"' contains "+dem.toUpperCase());
-							if (ret.containsKey(subject)) {
-								HashMap<String, Integer> newObjScoreWSDM = ret.get(subject);
-								if (newObjScoreWSDM.containsKey(obj)) {
-									newObjScoreWSDM.put(obj, newObjScoreWSDM.get(obj) + 1);									
+					if (dem != null) {
+						// for each Microsoft type
+	//					for (String type : objScoreMs.keySet()) {
+						for (String key : keySet) {
+							String type = key;
+							System.out.println(subject + " => " + dem + " => " + type);
+							if (type.toLowerCase().contains(dem)) {
+								System.out.println("Hey, for "+subject+", '"+type+"' contains "+dem.toUpperCase());
+								if (ret.containsKey(subject)) {
+									HashMap<String, Integer> newObjScoreWSDM = ret.get(subject);
+									if (newObjScoreWSDM.containsKey(obj)) {
+										newObjScoreWSDM.put(obj, newObjScoreWSDM.get(obj) + 1);									
+									} else {
+										newObjScoreWSDM.put(obj, 1);
+									}
 								} else {
+									HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
 									newObjScoreWSDM.put(obj, 1);
+									ret.put(subject, newObjScoreWSDM);
 								}
-							} else {
-								HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
-								newObjScoreWSDM.put(obj, 1);
-								ret.put(subject, newObjScoreWSDM);
 							}
 						}
 					}
@@ -130,7 +137,7 @@ public class Cross {
 	 * @
 	 */
 	private static HashMap<String, HashMap<String, Integer>> crossNewScore(
-			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft) throws SQLException {
+			HashMap<String, HashMap<String, Integer>> hWSDM, HashMap<String, HashMap<String, Integer>> hMicrosoft) throws Exception {
 				
 		HashMap<String, HashMap<String, Integer>> ret = new HashMap<String, HashMap<String, Integer>>();
 		// hWSDM.keySet().parallelStream().forEach(elem ->
@@ -141,7 +148,9 @@ public class Cross {
 			//if(subMs != null){
 //				HashMap<String, Integer> objScoreMs = hMicrosoft.get(subject);
 				
-				SQLObject s = sql.getEverything(subject);
+//				SQLObject s = sql.getEverything(subject);
+				KBObject s = kbox.getEverything(subject);
+				
 				System.out.println(subject);
 				if(!s.isEmpty()) {
 					HashMap<String, Integer> objScoreWSDM = hWSDM.get(subject);
@@ -152,12 +161,14 @@ public class Cross {
 							HashMap<String, Integer> newObjScoreWSDM = new HashMap<String, Integer>();
 	//						int oldScore = objScoreMs.get(obj);
 	//						int maxScore = maxScores.get(subject);
-							int newScore = Math.round(1 + (float) oldScore / s.getMax() * 6.0f);
+//							int newScore = Math.round(1 + (float) oldScore / s.getMax() * 6.0f);
 							
 							if (ret.containsKey(subject))
-								ret.get(subject).put(obj, newScore);
+//								ret.get(subject).put(obj, newScore);
+								ret.get(subject).put(obj, oldScore);
 							else {
-								newObjScoreWSDM.put(obj, newScore);
+//								newObjScoreWSDM.put(obj, newScore);
+								newObjScoreWSDM.put(obj, oldScore);
 								ret.put(subject, newObjScoreWSDM);
 							}
 						}
