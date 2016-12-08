@@ -27,7 +27,7 @@ def strategy(diga, tom):
 #   Root mean squared error                  2.1677
 #   Total Number of Instances              677
 # 
-# Combined with the TwoFive rule (sep=3.5) gives: Nationality=0.86 & Professions=0.76
+# Combined with the TwoFive rule (sep=3.5) gives: Nationality=0.88 & Professions=0.77
 #
 def multi_strategy(v):
     diga, tom, tom_dem, andre, andre_dem = v[0], v[1], v[2], v[3], v[4]

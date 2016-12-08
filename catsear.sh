@@ -52,6 +52,6 @@ for inp in "${input[@]}"
 	
 	# super-classifier
 	# write output to ${output}/${inp}
-	python python/super/wekastrategy.py 3.4 ${inp} ${output} predictions-1.txt predictions-2.txt predictions-3.txt predictions-4.txt predictions-5.txt
+	python python/super/wekastrategy.py 3.5 ${inp} ${output} predictions-1.txt predictions-2.txt predictions-3.txt predictions-4.txt predictions-5.txt
 	
 done
