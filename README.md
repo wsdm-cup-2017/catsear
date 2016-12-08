@@ -72,3 +72,17 @@ Now that the libraries are installed, you can comment/remove the scope and syste
 ```
 mvn clean compile assembly:single
 ```
+
+###Step 4: Copy the generated jar at \target to the root directory and rename it to starpath.v0.0.1-beta.jar
+
+###Step 5: Execute the script setup.sh
+This script will compile graph-cross project.
+
+#Executing
+
+The project can be easily executed by the script catsear.sh as following
+
+```
+./catsear.sh -i input -o output
+```
+
