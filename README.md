@@ -2,6 +2,9 @@
 The Catsear Triple Scorer
 
 
+- [Project Setup](https://github.com/tira-io/catsear#project-setup)
+- [Executing](https://github.com/tira-io/catsear#executing)
+
 #Project Setup
 
 Before start it is necessary to setup the Maven in your machine.
