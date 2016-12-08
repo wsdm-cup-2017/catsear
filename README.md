@@ -3,6 +3,8 @@ The Catsear Triple Scorer
 
 
 - [Project Setup](https://github.com/tira-io/catsear#project-setup)
+--[Eclipse](https://github.com/tira-io/catsear#eclipse)
+--[Maven](https://github.com/tira-io/catsear#eclipse)
 - [Executing](https://github.com/tira-io/catsear#executing)
 
 #Project Setup
@@ -83,7 +85,7 @@ This script will compile graph-cross project.
 
 #Executing
 
-The project can be easily executed by the script catsear.sh as following
+The project can be easily executed by the script catsear.sh as following:
 
 ```
 ./catsear.sh -i input -o output
