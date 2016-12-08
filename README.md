@@ -3,8 +3,11 @@ The Catsear Triple Scorer
 
 
 - [Project Setup](https://github.com/tira-io/catsear#project-setup)
+
 ...[Eclipse](https://github.com/tira-io/catsear#eclipse)
+
 ...[Maven](https://github.com/tira-io/catsear#eclipse)
+
 - [Executing](https://github.com/tira-io/catsear#executing)
 
 #Project Setup
