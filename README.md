@@ -14,13 +14,14 @@ Please read the documentation on how to intall Maven:
 
 http://maven.apache.org/install.html
 
-##Eclipse:
 
 ###Step 1: Clone the project
 
 ```
 git clone https://github.com/tira-io/catsear.git
 ```
+
+##Eclipse:
 
 ###Step 2: Create the Eclipse project:
 Execute the following command line at your cloned project.
