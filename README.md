@@ -15,13 +15,14 @@ http://maven.apache.org/install.html
 
 ```
 git clone https://github.com/tira-io/catsear.git
-´´´
+```
 
 ###Step 2: Create the Eclipse project:
 Execute the following command line at your cloned project.
+
 ```
 mv eclipse:eclipse
-´´´
+```
 
 ##Maven
 
@@ -37,13 +38,13 @@ libs directory:
 
 ###Step 1: To setup the libraries above you should execute the following command line for each of them:
 
-´´´
+```
 mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>
 ```
 
 You can also copy paste the following commands:
 
-´´´
+```
 mvn install:install-file -Dfile=/libs/kbox-v0.0.1-alpha2.jar -DgroupId=org.aksw.kbox -DartifactId=kbox -Dversion=v0.0.1-alpha2 -Dpackaging=jar
 mvn install:install-file -Dfile=/libs/dbtrends.core-v0.1.3-beta.jar -DgroupId=org.aksw.dbtrends -DartifactId=dbtrends.core -Dversion=v0.1.3-beta -Dpackaging=jar
 mvn install:install-file -Dfile=/libs/dbtrends.scc-v0.1.3-beta.jar -DgroupId=org.aksw.dbtrends -DartifactId=dbtrends.scc -Dversion=v0.1.3-beta -Dpackaging=jar
@@ -63,10 +64,11 @@ Now that the libraries are installed, you can comment/remove the scope and syste
         <!--scope>system</scope>                                                            #remove/comment this line
         <systemPath>${project.basedir}/libs/starpath.indexbuilder.xingu.jar</systemPath-->  #remove/comment this line
 	</dependency>
-´´´
+
+```
 
 ###Step 3: Execute MVN compile in a single jar
 
-´´´
+```
 mvn clean compile assembly:single
 ```
