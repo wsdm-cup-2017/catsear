@@ -33,7 +33,7 @@ mv eclipse:eclipse
 ##Maven
 
 Before compile the project using Maven it is necessary to install localy the following libraries found at 
-libs directory:
+*libs* directory:
 
 * kbox-v0.0.1-alpha2.jar
 * dbtrends.scc-v0.1.3-beta.jar
@@ -60,7 +60,7 @@ mvn install:install-file -Dfile=/libs/starpath.indexbuilder.xingu.jar -DgroupId=
 ```
 
 ###Step 2: Now, you must setup your pom file.
-Now that the libraries are installed, you can comment/remove the scope and systemPath tags from your pom file for all the six files in the libs directory as follows:
+Now that the libraries are installed, you can comment/remove the *scope* and *systemPath* tags from your pom file for all the six files in the libs directory as follows:
 
 ```
 	<dependency>
@@ -79,7 +79,7 @@ Now that the libraries are installed, you can comment/remove the scope and syste
 mvn clean compile assembly:single
 ```
 
-###Step 4: Copy the generated jar at \target to the root directory and rename it to starpath.v0.0.1-beta.jar
+###Step 4: Copy the generated jar at *\target* to the root directory and rename it to starpath.v0.0.1-beta.jar
 
 ###Step 5: Execute the script setup.sh
 This script will compile graph-cross project.
