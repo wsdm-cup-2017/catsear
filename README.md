@@ -114,6 +114,14 @@ python python/skipgram/embed.py processed-sentences.txt python/skipgram/instance
 
 Set `10` for the size parameter.
 
+The Linear Regression classifier can be found in file `python/super/wekastrategy.py`. The used formula was found by maximizing the accuracy on the training set using 10-fold cross-validation. To reproduce the experiments, download [Weka](http://www.cs.waikato.ac.nz/ml/weka/) and create the CSV file to use as training set with:
+
+```
+python python/super/wekamake.py /path/to/input/dataset predictions-1.txt predictions-2.txt predictions-3.txt predictions-4.txt predictions-5.txt training.csv
+```
+
+Note that outputs `predictions-*.txt` from all 5 modules must have been generated before.
+
 ## Prediction
 
 The project can be easily executed by the script `catsear.sh` as following:
@@ -122,7 +130,7 @@ The project can be easily executed by the script `catsear.sh` as following:
 ./catsear.sh -i /path/to/input/dataset [-i /path/to/another/input/dataset] -o /path/to/output/
 ```
 
-The Linear Regression classifier can be found in file `python/super/wekastrategy.py`. The used formula was found by maximizing the accuracy on the training set using 10-fold cross-validation.
+
 
 ## Citing this work
 
