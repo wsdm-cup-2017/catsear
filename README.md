@@ -100,15 +100,21 @@ Execute the script `setup.sh`. This script will fetch the needed files and compi
 
 ## Learning
 
-The Python-based module is based on Word2Vec. The embeddings are learned on the `wiki-sentences` file by calling:
+The Python-based module is based on Word2Vec. The `wiki-sentences` file is first pre-processed with:
 
 ```
-python python/skipgram/embed.py input_file.txt output_model.bin <size>
+python python/skipgram/process_corpus.py /path/to/wiki-sentences > processed-sentences.txt
+```
+
+The embeddings are learned with:
+
+```
+python python/skipgram/embed.py processed-sentences.txt python/skipgram/instance-sentences.bin <size>
 ```
 
 Set `10` for the size parameter.
 
-## Predict
+## Prediction
 
 The project can be easily executed by the script `catsear.sh` as following:
 
@@ -116,3 +122,10 @@ The project can be easily executed by the script `catsear.sh` as following:
 ./catsear.sh -i /path/to/input/dataset [-i /path/to/another/input/dataset] -o /path/to/output/
 ```
 
+The Linear Regression classifier can be found in file `python/super/wekastrategy.py`. The used formula was found by maximizing the accuracy on the training set using 10-fold cross-validation.
+
+## Citing this work
+
+```
+TBA
+```
