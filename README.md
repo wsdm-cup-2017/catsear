@@ -1,4 +1,4 @@
-# Catsear
+# 😺 Catsear
 
 The **Catsear Triple Scorer** is a competitor in the Triple Scoring Challenge at WSDM 2017. It is based on a hybrid approach involving several modules. The answers from all modules are finally combined by a Linear Regression classifier.
 
