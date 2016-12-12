@@ -243,7 +243,7 @@ public class Cross {
 			String[] elems = line.split("\t");
 			String subject = elems[0].toLowerCase();
 			String object = elems[1].toLowerCase();
-			int score = Integer.parseInt(elems[2]);
+			int score = 0; // Integer.parseInt(elems[2]);
 			HashMap<String, Integer> objectScore = new HashMap<String, Integer>();
 
 			if (ret.containsKey(subject))
