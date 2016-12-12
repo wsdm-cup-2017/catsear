@@ -56,7 +56,7 @@ mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> -DartifactId
 You can also copy-paste the following commands:
 
 ```
-mvn install:install-file -Dfile=libs/kbox-v0.0.1-alpha2.jar -DgroupId=org.aksw.kbox -DartifactId=kbox -Dversion=v0.0.1-alpha2 -Dpackaging=jar
+mvn install:install-file -Dfile=libs/kbox-v0.0.1-alpha2.jar -DgroupId=org.aksw.kbox -DartifactId=kbox.kibe -Dversion=v0.0.1-alpha2 -Dpackaging=jar
 mvn install:install-file -Dfile=libs/dbtrends.core-v0.1.3-beta.jar -DgroupId=org.aksw.dbtrends -DartifactId=dbtrends.core -Dversion=v0.1.3-beta -Dpackaging=jar
 mvn install:install-file -Dfile=libs/dbtrends.scc-v0.1.3-beta.jar -DgroupId=org.aksw.dbtrends -DartifactId=dbtrends.scc -Dversion=v0.1.3-beta -Dpackaging=jar
 mvn install:install-file -Dfile=libs/starpath.benchmark.jar -DgroupId=org.aksw.starpath -DartifactId=starpath.benchmark -Dversion=v0.0.1-beta -Dpackaging=jar
